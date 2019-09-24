@@ -3,4 +3,5 @@
 !.gitignore
 !LICENSE
 !README.md
+!Makefile
 !cclemon.c
