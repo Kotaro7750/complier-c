@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdarg.h>
+#include <string.h>
 
 typedef enum{
   TK_RESERVED,
@@ -28,6 +29,7 @@ struct Token {
   Token* next;
   int val;
   char* str;
+  int len;
 };
 
 typedef struct Node Node;
@@ -40,10 +42,11 @@ struct Node {
 };
 
 
-Token* createToken(TokenKind kind,Token* cur,char* str){
+Token* createToken(TokenKind kind,Token* cur,char* str,int len){
   Token* new = (Token *)calloc(1, sizeof(Token));
   new->kind = kind;
   new->str = str;
+  new->len = len;
   cur->next = new;
 
   return new;
@@ -63,6 +66,10 @@ void error(char* loc,char* fmt,...){
   exit(1);
 }
 
+bool startsWith(char* p,char* q){
+  return memcmp(p,q,strlen(q)) == 0;
+}
+
 Token* tokenize(char* p){
   Token head;
   head.next = NULL;
@@ -73,24 +80,31 @@ Token* tokenize(char* p){
       ++p;
       continue;
     }
+    if(startsWith(p,"<=") || startsWith(p, ">=") || startsWith(p, "==") || startsWith(p, "!=")){
+      cur = createToken(TK_RESERVED, cur, p,2);
+      p+=2;
+      continue;
+    }
     if(*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' || *p == ')'){
-      cur = createToken(TK_RESERVED, cur, p++);
+      cur = createToken(TK_RESERVED, cur, p++,1);
       continue;
     }
     if(isdigit(*p)){
-      cur = createToken(TK_NUM, cur, p);
+      char* q = p;
+      cur = createToken(TK_NUM, cur, p,0);
       cur->val = strtol(p,&p,10);
+      cur->len = p - q;
       continue;
     }
     error(p,"トークナイズできません");
   }
 
-  createToken(TK_EOF, cur,p);
+  createToken(TK_EOF, cur,p,0);
   return head.next;
 }
 
-bool consume(char op){
-  if(CurTok->kind != TK_RESERVED || CurTok->str[0]  != op){
+bool consume(char* op){
+  if(CurTok->kind != TK_RESERVED || strlen(op) != CurTok->len || memcmp(CurTok->str, op, CurTok->len)){
     return false;
   }
   CurTok = CurTok->next;
@@ -108,9 +122,9 @@ int expectNumber(){
   return val;
 }
 
-void expect(char op){
-  if (CurTok->kind != TK_RESERVED || CurTok->str[0] != op) {
-    error(CurTok->str,"'%c'ではありません\n",op);
+void expect(char* op){
+  if (CurTok->kind != TK_RESERVED || strlen(op) == CurTok->len || memcmp(CurTok->str, op, CurTok->len)) {
+    error(CurTok->str,"'%s'ではありません\n",op);
   }
   CurTok = CurTok->next;
 }
@@ -145,9 +159,9 @@ Node* expr(){
   Node* node = mul();
 
   for(;;){
-    if(consume('+')){
+    if(consume("+")){
       node = createNode(ND_ADD, node, mul());
-    }else if (consume('-')) {
+    }else if (consume("-")) {
       node = createNode(ND_SUB, node, mul());
     }else {
       return node;
@@ -159,10 +173,10 @@ Node* mul(){
   Node* node = unary();
 
   for(;;){
-    if(consume('*')){
+    if(consume("*")){
       node = createNode(ND_MUL, node, unary());
     }
-    else if(consume('/')){
+    else if(consume("/")){
       node = createNode(ND_DIV, node, unary());
     }else {
       return node;
@@ -171,18 +185,18 @@ Node* mul(){
 }
 
 Node* unary(){
-  if(consume('+')){
+  if(consume("+")){
     return primary();
-  }else if (consume('-')) {
+  }else if (consume("-")) {
     return createNode(ND_SUB, createNumNode(0), primary());
   }
   return primary();
 }
 
 Node* primary(){
-  if(consume('(')){
+  if(consume("(")){
     Node* node = expr();
-    expect(')');
+    expect(")");
     return node;
   }
   return createNumNode(expectNumber());
