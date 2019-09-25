@@ -123,7 +123,7 @@ int expectNumber(){
 }
 
 void expect(char* op){
-  if (CurTok->kind != TK_RESERVED || strlen(op) == CurTok->len || memcmp(CurTok->str, op, CurTok->len)) {
+  if (CurTok->kind != TK_RESERVED || strlen(op) != CurTok->len || memcmp(CurTok->str, op, CurTok->len)) {
     error(CurTok->str,"'%s'ではありません\n",op);
   }
   CurTok = CurTok->next;
