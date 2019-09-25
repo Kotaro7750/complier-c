@@ -12,6 +12,7 @@ typedef enum{
 
 
 typedef struct Token Token;
+char* user_input;
 
 struct Token {
   TokenKind kind;
@@ -32,11 +33,16 @@ Token* createToken(TokenKind kind,Token* cur,char* str){
   return new;
 }
 
-void error(char* fmt,...){
+void error(char* loc,char* fmt,...){
+  int pos = loc - user_input;
+  fprintf(stderr, "%s\n",user_input);
+  fprintf(stderr, "%*s",pos,"");
+  fprintf(stderr, "^ \n");
   va_list ap;
   va_start(ap, fmt);
   vprintf(fmt, ap);
   va_end(ap);
+  fprintf(stderr, "\n");
 }
 
 Token* tokenize(char* p){
@@ -58,7 +64,7 @@ Token* tokenize(char* p){
       cur->val = strtol(p,&p,10);
       continue;
     }
-    error("トークナイズできません");
+    error(p,"トークナイズできません");
   }
 
   createToken(TK_EOF, cur,p);
@@ -75,7 +81,7 @@ bool consume(char op){
 
 int expectNumber(){
   if(CurTok->kind != TK_NUM){
-    error("数ではありません");
+    error(CurTok->str,"数ではありません");
   }
 
   int val = CurTok->val;
@@ -86,7 +92,7 @@ int expectNumber(){
 
 void expect(char op){
   if (CurTok->kind != TK_RESERVED || CurTok->str[0] != op) {
-    error("'%c'ではありません\n",op);
+    error(CurTok->str,"'%c'ではありません\n",op);
   }
   CurTok = CurTok->next;
 }
@@ -100,9 +106,9 @@ int main(int argc, char** argv){
     fprintf(stderr,"引数の個数が正しくありません");
     return 1;
   }
-  char* p = argv[1];
+  user_input = argv[1];
 
-  CurTok = tokenize(p);
+  CurTok = tokenize(user_input);
 
   printf(".intel_syntax noprefix\n");
   printf(".global main\n");
