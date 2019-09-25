@@ -55,6 +55,10 @@ Node* createNumNode(int val){
 }
 
 Node* expr(){
+  return add();
+}
+
+Node* add(){
   Node* node = mul();
 
   for(;;){
@@ -66,6 +70,7 @@ Node* expr(){
       return node;
     }
   }
+
 }
 
 Node* mul(){

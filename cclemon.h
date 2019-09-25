@@ -50,6 +50,7 @@ int at_eof();
 struct Node* createNode(NodeKind kind,struct Node* lhs,struct Node* rhs);
 struct Node* createNumNode(int val);
 struct Node* expr();
+struct Node* add();
 struct Node* mul();
 struct Node* unary();
 struct Node* primary();
