@@ -39,6 +39,16 @@ void gen(Node* node){
       printf("  setne al\n");
       printf("  movzb rax, al\n");
       break;
+    case ND_GT:
+      printf("  cmp rax,rdi\n");
+      printf("  setne al\n");
+      printf("  movzb rax, al\n");
+      break;
+    case ND_GTE:
+      printf("  cmp rax,rdi\n");
+      printf("  setne al\n");
+      printf("  movzb rax, al\n");
+      break;
     default:
       break;
   }

@@ -16,7 +16,9 @@ typedef enum{
   ND_DIV,
   ND_EQ,
   ND_NEQ,
-  ND_NUM
+  ND_NUM,
+  ND_GT,
+  ND_GTE
 } NodeKind;
 
 struct Token {
