@@ -138,6 +138,7 @@ Node* createNumNode(int val){
 
 Node* expr();
 Node* mul();
+Node* unary();
 Node* primary();
 
 Node* expr(){
@@ -155,18 +156,27 @@ Node* expr(){
 }
 
 Node* mul(){
-  Node* node = primary();
+  Node* node = unary();
 
   for(;;){
     if(consume('*')){
-      node = createNode(ND_MUL, node, primary());
+      node = createNode(ND_MUL, node, unary());
     }
     else if(consume('/')){
-      node = createNode(ND_DIV, node, primary());
+      node = createNode(ND_DIV, node, unary());
     }else {
       return node;
     }
   }
+}
+
+Node* unary(){
+  if(consume('+')){
+    return primary();
+  }else if (consume('-')) {
+    return createNode(ND_SUB, createNumNode(0), primary());
+  }
+  return primary();
 }
 
 Node* primary(){
