@@ -4,5 +4,6 @@
 !LICENSE
 !README.md
 !Makefile
-!cclemon.c
+!*.c
+!*.h
 !test.sh

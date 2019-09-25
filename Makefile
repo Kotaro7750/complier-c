@@ -1,6 +1,11 @@
 CFLAGS=-Wall -g -std=c11 -static
+SRCS=$(wildcard *.c)
+OBJS=$(SRCS:.c=.o)
 
-cclemon: cclemon.c
+cclemon: $(OBJS)
+	$(CC) -o cclemon $(OBJS) $(LDFLAGS)
+
+$(OBJS): cclemon.h
 
 test: cclemon
 	./test.sh
