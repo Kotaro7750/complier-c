@@ -29,6 +29,16 @@ void gen(Node* node){
       printf("  cqo\n");
       printf("  idiv rdi\n");
       break;
+    case ND_EQ:
+      printf("  cmp rax,rdi\n");
+      printf("  sete al\n");
+      printf("  movzb rax, al\n");
+      break;
+    case ND_NEQ:
+      printf("  cmp rax,rdi\n");
+      printf("  setne al\n");
+      printf("  movzb rax, al\n");
+      break;
     default:
       break;
   }

@@ -14,6 +14,8 @@ typedef enum{
   ND_SUB,
   ND_MUL,
   ND_DIV,
+  ND_EQ,
+  ND_NEQ,
   ND_NUM
 } NodeKind;
 
@@ -50,6 +52,8 @@ int at_eof();
 struct Node* createNode(NodeKind kind,struct Node* lhs,struct Node* rhs);
 struct Node* createNumNode(int val);
 struct Node* expr();
+struct Node* equality();
+struct Node* relational();
 struct Node* add();
 struct Node* mul();
 struct Node* unary();

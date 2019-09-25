@@ -55,6 +55,24 @@ Node* createNumNode(int val){
 }
 
 Node* expr(){
+  return equality();
+}
+
+Node* equality(){
+  Node* node = relational();
+
+  for(;;){
+    if(consume("==")){
+      node = createNode(ND_EQ, node, relational());
+    }else if (consume("!=")) {
+      node = createNode(ND_NEQ,node,relational());
+    }else {
+      return node;
+    }
+  }
+}
+
+Node* relational(){
   return add();
 }
 
@@ -70,7 +88,6 @@ Node* add(){
       return node;
     }
   }
-
 }
 
 Node* mul(){
