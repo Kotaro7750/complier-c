@@ -36,7 +36,7 @@ Token* tokenize(char* p){
       p+=2;
       continue;
     }
-    if(*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' || *p == ')'){
+    if(*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' || *p == ')' || *p == '<' || *p == '>'){
       cur = createToken(TK_RESERVED, cur, p++,1);
       continue;
     }

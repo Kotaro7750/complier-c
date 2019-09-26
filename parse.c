@@ -73,6 +73,20 @@ Node* equality(){
 }
 
 Node* relational(){
+  Node* node = add();
+  for(;;){
+    if(consume(">")){
+      node = createNode(ND_GT, node, add());
+    }else if (consume("<")) {
+      node = createNode(ND_GT, add(), node);
+    }else if (consume(">=")) {
+      node = createNode(ND_GTE, node, add());
+    }else if(consume("<=")){
+      node= createNode(ND_GTE, add(), node);
+    }else {
+      return node;
+    }
+  }
   return add();
 }
 
