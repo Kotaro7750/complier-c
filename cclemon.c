@@ -10,11 +10,21 @@ typedef struct Node Node;
 Token* CurTok;
 char* user_input;
 
-void error(char* loc,char* fmt,...){
+void error_at(char* loc,char* fmt,...){
   int pos = loc - user_input;
   fprintf(stderr, "%s\n",user_input);
   fprintf(stderr, "%*s",pos,"");
   fprintf(stderr, "^ \n");
+  va_list ap;
+  va_start(ap, fmt);
+  vprintf(fmt, ap);
+  va_end(ap);
+  fprintf(stderr, "\n");
+
+  exit(1);
+}
+
+void error(char* fmt,...){
   va_list ap;
   va_start(ap, fmt);
   vprintf(fmt, ap);
@@ -37,10 +47,17 @@ int main(int argc, char** argv){
   printf(".global main\n");
   printf("main:\n");
 
+  printf("  push rbp\n");
+  printf("  mov rbp,rsp\n");
+  printf("  sub rsp,208\n");
+
   Node* node = expr();
   gen(node);
 
   printf("  pop rax\n");
+
+  printf("  mov rsp,rbp\n");
+  printf("  pop rbp\n");
   printf("  ret\n");
   return 0;
 }

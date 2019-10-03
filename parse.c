@@ -6,6 +6,7 @@
 extern struct Token* CurTok;
 
 typedef struct Node Node;
+typedef struct Token Token;
 
 bool consume(char* op){
   if(CurTok->kind != TK_RESERVED || strlen(op) != CurTok->len || memcmp(CurTok->str, op, CurTok->len)){
@@ -15,9 +16,18 @@ bool consume(char* op){
   return true;
 }
 
+Token* consumeToken(){
+  if(CurTok->kind != TK_IDENT){
+    return NULL;
+  }
+  Token* ret = CurTok;
+  CurTok = CurTok->next;
+  return ret;
+}
+
 int expectNumber(){
   if(CurTok->kind != TK_NUM){
-    error(CurTok->str,"数ではありません");
+    error_at(CurTok->str,"数ではありません");
   }
 
   int val = CurTok->val;
@@ -28,13 +38,17 @@ int expectNumber(){
 
 void expect(char* op){
   if (CurTok->kind != TK_RESERVED || strlen(op) != CurTok->len || memcmp(CurTok->str, op, CurTok->len)) {
-    error(CurTok->str,"'%s'ではありません\n",op);
+    error_at(CurTok->str,"'%s'ではありません\n",op);
   }
   CurTok = CurTok->next;
 }
 
 int at_eof(){
   return CurTok->kind == TK_EOF;
+}
+
+int at_ident(){
+  return CurTok->kind == TK_IDENT;
 }
 
 Node* createNode(NodeKind kind,Node* lhs,Node* rhs){
@@ -54,8 +68,23 @@ Node* createNumNode(int val){
   return new;
 }
 
+Node* createIdentNode(Token* tok){
+  Node* new = (Node*)calloc(1, sizeof(Node));
+  new->kind = ND_LVAR;
+  new->offset = (tok->str[0] - 'a' + 1)*8;
+  return new;
+}
+
 Node* expr(){
-  return equality();
+  return assign();
+}
+
+Node* assign(){
+  Node* node = equality();
+  if(consume("=")){
+    node = createNode(ND_ASSIGN, node, assign());
+  }
+  return node;
 }
 
 Node* equality(){
@@ -133,6 +162,10 @@ Node* primary(){
     Node* node = expr();
     expect(")");
     return node;
+  }
+  if(at_ident()){
+    Token* tok = consumeToken();
+    return createIdentNode(tok);
   }
   return createNumNode(expectNumber());
 }

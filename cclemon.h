@@ -6,6 +6,7 @@
 typedef enum{
   TK_RESERVED,
   TK_NUM,
+  TK_IDENT,
   TK_EOF
 } TokenKind;
 
@@ -18,7 +19,9 @@ typedef enum{
   ND_NEQ,
   ND_NUM,
   ND_GT,
-  ND_GTE
+  ND_GTE,
+  ND_ASSIGN,
+  ND_LVAR
 } NodeKind;
 
 struct Token {
@@ -34,12 +37,14 @@ struct Node {
   struct Node* lhs;
   struct Node* rhs;
   int val;
+  int offset;
 };
 
 extern struct Token* CurTok;
 
 
-void error(char* loc,char* fmt,...);
+void error_at(char* loc,char* fmt,...);
+void error(char* fmt,...);
 
 //lexer.c
 struct Token* createToken(TokenKind kind,struct Token* cur,char* str,int len);
@@ -54,6 +59,7 @@ int at_eof();
 struct Node* createNode(NodeKind kind,struct Node* lhs,struct Node* rhs);
 struct Node* createNumNode(int val);
 struct Node* expr();
+struct Node* assign();
 struct Node* equality();
 struct Node* relational();
 struct Node* add();

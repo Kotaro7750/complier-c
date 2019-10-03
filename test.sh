@@ -47,4 +47,5 @@ try 0 '1>2'
 try 1 '1>=0'
 try 1 '1>=1'
 try 0 '1>=2'
+try 3 'a=3'
 echo OK
