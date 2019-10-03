@@ -8,6 +8,7 @@ typedef struct Token Token;
 typedef struct Node Node;
 
 Token* CurTok;
+Node* code[100];
 char* user_input;
 
 void error_at(char* loc,char* fmt,...){
@@ -51,10 +52,12 @@ int main(int argc, char** argv){
   printf("  mov rbp,rsp\n");
   printf("  sub rsp,208\n");
 
-  Node* node = expr();
-  gen(node);
+  program();
+  for(int i = 0;code[i];i++){
+    gen(code[i]);
+    printf("  pop rax\n");
+  }
 
-  printf("  pop rax\n");
 
   printf("  mov rsp,rbp\n");
   printf("  pop rbp\n");

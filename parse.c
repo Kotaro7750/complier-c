@@ -8,6 +8,8 @@ extern struct Token* CurTok;
 typedef struct Node Node;
 typedef struct Token Token;
 
+extern Node* code[100];
+
 bool consume(char* op){
   if(CurTok->kind != TK_RESERVED || strlen(op) != CurTok->len || memcmp(CurTok->str, op, CurTok->len)){
     return false;
@@ -73,6 +75,22 @@ Node* createIdentNode(Token* tok){
   new->kind = ND_LVAR;
   new->offset = (tok->str[0] - 'a' + 1)*8;
   return new;
+}
+
+Node** program(){
+  for(int i = 0;i < 100;i++){
+    if(at_eof()){
+      break;
+    }
+    code[i] = stmt();
+  }
+  return code;
+}
+
+Node* stmt(){
+  Node* node = expr();
+  expect(";");
+  return node;
 }
 
 Node* expr(){

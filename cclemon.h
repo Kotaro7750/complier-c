@@ -41,6 +41,7 @@ struct Node {
 };
 
 extern struct Token* CurTok;
+extern struct Node* code[100];
 
 
 void error_at(char* loc,char* fmt,...);
@@ -58,6 +59,8 @@ void expect(char* op);
 int at_eof();
 struct Node* createNode(NodeKind kind,struct Node* lhs,struct Node* rhs);
 struct Node* createNumNode(int val);
+struct Node** program();
+struct Node* stmt();
 struct Node* expr();
 struct Node* assign();
 struct Node* equality();
