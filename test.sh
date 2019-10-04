@@ -49,4 +49,5 @@ try 1 '1>=1;'
 try 0 '1>=2;'
 try 3 'a=3;'
 try 7 'a=3;a+4;'
+try 7 'ab=3;ac=4;ab+ac;'
 echo OK

@@ -49,7 +49,10 @@ Token* tokenize(char* p){
     }
     if('a' <= *p && *p <= 'z'){
       cur = createToken(TK_IDENT, cur, p++, 1);
-      cur->len = 1;
+      while('a' <= *p && *p <= 'z'){
+        p++;
+        cur->len++;
+      }
       continue;
     }
     error_at(p,"トークナイズできません");

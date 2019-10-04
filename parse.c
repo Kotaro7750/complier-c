@@ -3,10 +3,12 @@
 #include <stdlib.h>
 #include "cclemon.h"
 
-extern struct Token* CurTok;
+struct Token* CurTok;
+struct LVar* locals;
 
 typedef struct Node Node;
 typedef struct Token Token;
+typedef struct LVar LVar;
 
 extern Node* code[100];
 
@@ -18,7 +20,7 @@ bool consume(char* op){
   return true;
 }
 
-Token* consumeToken(){
+Token* consumeIdent(){
   if(CurTok->kind != TK_IDENT){
     return NULL;
   }
@@ -45,12 +47,21 @@ void expect(char* op){
   CurTok = CurTok->next;
 }
 
-int at_eof(){
+int atEOF(){
   return CurTok->kind == TK_EOF;
 }
 
-int at_ident(){
+int atIdent(){
   return CurTok->kind == TK_IDENT;
+}
+
+struct LVar* findLvar(struct Token* tok){
+  for(LVar* var = locals;var;var = var->next){
+    if(var->len == tok->len && !memcmp(var->name, tok->str, var->len)){
+      return var;
+    }
+  }
+  return NULL;
 }
 
 Node* createNode(NodeKind kind,Node* lhs,Node* rhs){
@@ -70,16 +81,9 @@ Node* createNumNode(int val){
   return new;
 }
 
-Node* createIdentNode(Token* tok){
-  Node* new = (Node*)calloc(1, sizeof(Node));
-  new->kind = ND_LVAR;
-  new->offset = (tok->str[0] - 'a' + 1)*8;
-  return new;
-}
-
 Node** program(){
   for(int i = 0;i < 100;i++){
-    if(at_eof()){
+    if(atEOF()){
       break;
     }
     code[i] = stmt();
@@ -181,9 +185,24 @@ Node* primary(){
     expect(")");
     return node;
   }
-  if(at_ident()){
-    Token* tok = consumeToken();
-    return createIdentNode(tok);
+  if((atIdent())){
+    Node* node = calloc(1, sizeof(Node));
+    node->kind = ND_LVAR;
+
+    Token* tok = consumeIdent();
+    LVar* lvar = findLvar(tok);
+    if(lvar){
+      node->offset = lvar->offset;
+    }else {
+      lvar = calloc(1, sizeof(LVar));
+      lvar->next = locals;
+      lvar->name = tok->str;
+      lvar->len = tok->len;
+      lvar->offset = locals->offset + 8;
+      node->offset = lvar->offset;
+      locals = lvar;
+    }
+    return node;
   }
   return createNumNode(expectNumber());
 }

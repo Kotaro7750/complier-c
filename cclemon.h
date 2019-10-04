@@ -40,15 +40,23 @@ struct Node {
   int offset;
 };
 
+struct LVar {
+  struct LVar* next;
+  char* name;
+  int len;
+  int offset;
+};
+
 extern struct Token* CurTok;
 extern struct Node* code[100];
+extern struct LVar* locals;
 
 
 void error_at(char* loc,char* fmt,...);
 void error(char* fmt,...);
 
 //lexer.c
-struct Token* createToken(TokenKind kind,struct Token* cur,char* str,int len);
+struct Token* createIdent(TokenKind kind,struct Token* cur,char* str,int len);
 bool startsWith(char* p,char* q);
 struct Token* tokenize(char* p);
 
@@ -56,7 +64,8 @@ struct Token* tokenize(char* p);
 bool consume(char* op);
 int expectNumber();
 void expect(char* op);
-int at_eof();
+int atEOF();
+struct LVar* findLvar(struct Token* tok);
 struct Node* createNode(NodeKind kind,struct Node* lhs,struct Node* rhs);
 struct Node* createNumNode(int val);
 struct Node** program();

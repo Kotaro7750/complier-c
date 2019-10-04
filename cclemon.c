@@ -6,10 +6,12 @@
 
 typedef struct Token Token;
 typedef struct Node Node;
+typedef struct LVar LVar;
 
 Token* CurTok;
 Node* code[100];
 char* user_input;
+LVar* locals;
 
 void error_at(char* loc,char* fmt,...){
   int pos = loc - user_input;
@@ -43,6 +45,8 @@ int main(int argc, char** argv){
   user_input = argv[1];
 
   CurTok = tokenize(user_input);
+
+  locals = (LVar *)calloc(1, sizeof(LVar));
 
   printf(".intel_syntax noprefix\n");
   printf(".global main\n");
