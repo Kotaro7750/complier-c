@@ -20,6 +20,10 @@ bool startsWith(char* p,char* q){
   return memcmp(p,q,strlen(q)) == 0;
 }
 
+int isAlnum(char c){
+  return (('a' <= c && c <= 'z') || ('0' <= c && c <= '9') || c == '_');
+}
+
 
 Token* tokenize(char* p){
   Token head;
@@ -45,6 +49,11 @@ Token* tokenize(char* p){
       cur = createToken(TK_NUM, cur, p,0);
       cur->val = strtol(p,&p,10);
       cur->len = p - q;
+      continue;
+    }
+    if(strncmp(p, "return",6) == 0 && !isAlnum(p[6])){
+      cur = createToken(TK_RET, cur, p, 6);
+      p+=6;
       continue;
     }
     if('a' <= *p && *p <= 'z'){

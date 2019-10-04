@@ -92,7 +92,15 @@ Node** program(){
 }
 
 Node* stmt(){
-  Node* node = expr();
+  Node* node;
+  if(CurTok->kind == TK_RET){
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_RET;
+    CurTok = CurTok->next;
+    node->lhs = expr();
+  }else {
+    node = expr();
+  }
   expect(";");
   return node;
 }
